@@ -8,6 +8,12 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+@app.route('/_add_numbers')
+def add_numbers():
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    return jsonify(result=a+b)
+
 @app.route('/predict/', methods=['GET','POST'])
 #def hell_world():
 #    return "Hell World!"
