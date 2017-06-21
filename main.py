@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
-from skimage.io import imread, imsave
-from skimage.transform import resize
+#from skimage.io import imread, imsave
+#from skimage.transform import resize
+from scipy.misc import imsave, imread, imresize
 import numpy as np
 from keras.models import model_from_json
 import tensorflow as tf
@@ -8,6 +9,7 @@ import re
 import sys
 import os
 import base64
+    
 
 app = Flask(__name__)
 
@@ -26,7 +28,8 @@ def model_init():
 def convertImage(imgData1):
     imgstr = re.search(r'base64,(.*)', imgData1).group(1)
     with open('output.png', 'wb') as output:
-        output.write(imgstr.decode('base64'))
+        #output.write(imgstr.decode('base64'))
+        output.write(base64.b64decode(imgstr))
 
 model, graph = model_init()
         
@@ -50,11 +53,16 @@ def predict():
     convertImage(imgData)
     print("debug")
     
-    x = imread('output.png', as_grey=True)
-    x = np.invert(x.astype(np.uint8))
-    x = resize(x,(28,28))
+    #x = imread('output.png', as_grey=True)
+    #x = np.invert(x.astype(np.uint8))
+    #x = resize(x,(28,28))
+    x = imread('output.png', mode='L')
+    x = np.invert(x)
+    x = imresize(x,(28,28))
     x = x.reshape(1,28,28,1)
+    
     print("debug2")
+    print(x)
     
     with graph.as_default():
         out = model.predict(x)
